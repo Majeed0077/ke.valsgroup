@@ -18,11 +18,12 @@ import ReportPageChrome, { useReportPageMobileView } from "@/features/reports/sh
 import { useMenuAccess } from "@/lib/useRbacAccess";
 import styles from "./TravelSummaryReportPage.module.css";
 import keLogo from "../../../../public/icons/KE.webp";
+import { DAYWISE_MIS_SOURCE_ROWS } from "./daywiseDistanceMisDummyData";
 
 const REPORT_REFERENCE_MONTH = "2016-09";
 const REPORT_PERIOD_LABEL = "01-Sep-2016 to 06-Sep-2016";
-const REPORTING_DATE_LABEL = "06-Sep-2016";
 const OPERATOR_OPTIONS = ["Greater Than", "Less Than", "Equal To"];
+const PAGE_SIZE_OPTIONS = [20, 50, 100, 200];
 const MIS_DATE_GROUPS = [
   { key: "2016-09-01", label: "01-Sep-2016" },
   { key: "2016-09-02", label: "02-Sep-2016" },
@@ -36,323 +37,12 @@ const MIS_SUB_COLUMNS = [
   { key: "offPeak", label: "KM's Driven Off Peak" },
   { key: "total", label: "Total KM's In a Day" },
 ];
-const SHEET_NOTES = [
-  '"Parked" in case of vehicle available at centre and shows zero running.',
-  '"UM" for Under Maintenance.',
-  '"TNI" for Tracker Not Installed.',
-  '"TR" for Tracker Removed.',
-  '"TNR" for tracker not reporting.',
-];
-
-const MIS_SOURCE_ROWS = [
-  {
-    company: "KE",
-    serial: 1,
-    object: "Z-6659",
-    ownership: "Own",
-    vendor: "KE",
-    trackerCompany: "Tracking World",
-    vehicleType: "Car",
-    group: "Distribution",
-    branch: "Region-II",
-    department: "IBC-SADDAR",
-    subDepartment: "Saddar-Revenue Protection & Recovery",
-    shiftHours: 24,
-    shiftTiming: "07:00 AM to 07:00 AM",
-    roadStatus: "On Road",
-    dayMetrics: {
-      "2016-09-01": { peak: 20.094, offPeak: 11.008, total: 31.102 },
-      "2016-09-02": { peak: 20.094, offPeak: 11.008, total: 31.102 },
-      "2016-09-03": { peak: 60.193, offPeak: "Parked", total: 60.193 },
-      "2016-09-04": { peak: 35.923, offPeak: "Parked", total: 35.923 },
-      "2016-09-05": { peak: 47.032, offPeak: 13.701, total: 60.733 },
-      "2016-09-06": { peak: 31.119, offPeak: 19.992, total: 51.111 },
-    },
-    excessIdling: 0,
-    harshBraking: 0,
-    speedViolation: 0,
-    travelTime: 0.07708333333333334,
-    stopTime: 0.9229166666666666,
-    remarks: "Reporting",
-  },
-  {
-    company: "KE",
-    serial: 2,
-    object: "CR-9847",
-    ownership: "Own",
-    vendor: "KE",
-    trackerCompany: "Tracking World",
-    vehicleType: "Van",
-    group: "Distribution",
-    branch: "Region-II",
-    department: "IBC-DEFENCE",
-    subDepartment: "Defence-Maintenance & Complaint",
-    shiftHours: 24,
-    shiftTiming: "07:00 AM to 07:00 AM",
-    roadStatus: "On Road",
-    dayMetrics: {
-      "2016-09-01": { peak: "Parked", offPeak: "Parked", total: "Parked" },
-      "2016-09-02": { peak: "Parked", offPeak: "Parked", total: "Parked" },
-      "2016-09-03": { peak: 6.655, offPeak: "Parked", total: 6.655 },
-      "2016-09-04": { peak: "Parked", offPeak: "Parked", total: "Parked" },
-      "2016-09-05": { peak: 7.905, offPeak: "Parked", total: 7.905 },
-      "2016-09-06": { peak: 7.328, offPeak: 6.564, total: 13.892 },
-    },
-    excessIdling: 0,
-    harshBraking: 0,
-    speedViolation: 2,
-    travelTime: 0.02152777777777778,
-    stopTime: 0.9784722222222222,
-    remarks: "Reporting",
-  },
-  {
-    company: "KE",
-    serial: 3,
-    object: "CN-8411",
-    ownership: "Own",
-    vendor: "KE",
-    trackerCompany: "Tracking World",
-    vehicleType: "Pickup",
-    group: "Distribution",
-    branch: "Region-I",
-    department: "IBC-SITE",
-    subDepartment: "SITE-Revenue Protection & Recovery",
-    shiftHours: 24,
-    shiftTiming: "07:00 AM to 07:00 AM",
-    roadStatus: "On Road",
-    dayMetrics: {
-      "2016-09-01": { peak: "Parked", offPeak: "Parked", total: "Parked" },
-      "2016-09-02": { peak: "Parked", offPeak: "Parked", total: "Parked" },
-      "2016-09-03": { peak: 19.154, offPeak: 11.483, total: 30.637 },
-      "2016-09-04": { peak: 17.972, offPeak: "Parked", total: 17.972 },
-      "2016-09-05": { peak: 9.994, offPeak: 2.925, total: 12.919 },
-      "2016-09-06": { peak: 14.911, offPeak: "Parked", total: 14.911 },
-    },
-    excessIdling: 0,
-    harshBraking: 0,
-    speedViolation: 4,
-    travelTime: 0.018055555555555557,
-    stopTime: 0.9819444444444444,
-    remarks: "Reporting",
-  },
-  {
-    company: "KE",
-    serial: 4,
-    object: "CN-2604",
-    ownership: "Own",
-    vendor: "KE",
-    trackerCompany: "Tracking World",
-    vehicleType: "Pickup",
-    group: "Distribution",
-    branch: "Region-III",
-    department: "IBC-BIN QASIM",
-    subDepartment: "BIN QASIM-Customer Accounts",
-    shiftHours: 24,
-    shiftTiming: "07:00 AM to 07:00 AM",
-    roadStatus: "On Road",
-    dayMetrics: {
-      "2016-09-01": { peak: 26.999, offPeak: "Parked", total: 26.999 },
-      "2016-09-02": { peak: 26.999, offPeak: "Parked", total: 26.999 },
-      "2016-09-03": { peak: 28.364, offPeak: "Parked", total: 28.364 },
-      "2016-09-04": { peak: "Parked", offPeak: "Parked", total: "Parked" },
-      "2016-09-05": { peak: 2.655, offPeak: "Parked", total: 2.655 },
-      "2016-09-06": { peak: 12.054, offPeak: "Parked", total: 12.054 },
-    },
-    excessIdling: 0,
-    harshBraking: 0,
-    speedViolation: 0,
-    travelTime: 0.011805555555555555,
-    stopTime: 0.9881944444444445,
-    remarks: "Reporting",
-  },
-  {
-    company: "KE",
-    serial: 5,
-    object: "CN-7875",
-    ownership: "Own",
-    vendor: "KE",
-    trackerCompany: "Tracking World",
-    vehicleType: "Pickup",
-    group: "Distribution",
-    branch: "Region-IV",
-    department: "Region-IV",
-    subDepartment: "Region-IV",
-    shiftHours: 24,
-    shiftTiming: "07:00 AM to 07:00 AM",
-    roadStatus: "On Road",
-    dayMetrics: {
-      "2016-09-01": { peak: "Parked", offPeak: "Parked", total: "Parked" },
-      "2016-09-02": { peak: "Parked", offPeak: "Parked", total: "Parked" },
-      "2016-09-03": { peak: 37.981, offPeak: "Parked", total: 37.981 },
-      "2016-09-04": { peak: "Parked", offPeak: "Parked", total: "Parked" },
-      "2016-09-05": { peak: "Parked", offPeak: "Parked", total: "Parked" },
-      "2016-09-06": { peak: "Parked", offPeak: "Parked", total: "Parked" },
-    },
-    excessIdling: 0,
-    harshBraking: 0,
-    speedViolation: 0,
-    travelTime: 0,
-    stopTime: 1,
-    remarks: "Parked",
-  },
-  {
-    company: "KE",
-    serial: 6,
-    object: "CR-3328",
-    ownership: "Own",
-    vendor: "KE",
-    trackerCompany: "Tracking World",
-    vehicleType: "Pickup",
-    group: "Distribution",
-    branch: "Region-IV",
-    department: "Region-IV",
-    subDepartment: "Region-IV",
-    shiftHours: 24,
-    shiftTiming: "07:00 AM to 07:00 AM",
-    roadStatus: "On Road",
-    dayMetrics: {
-      "2016-09-01": { peak: "UM", offPeak: "UM", total: "UM" },
-      "2016-09-02": { peak: "UM", offPeak: "UM", total: "UM" },
-      "2016-09-03": { peak: "UM", offPeak: "UM", total: "UM" },
-      "2016-09-04": { peak: "UM", offPeak: "UM", total: "UM" },
-      "2016-09-05": { peak: "UM", offPeak: "UM", total: "UM" },
-      "2016-09-06": { peak: "UM", offPeak: "UM", total: "UM" },
-    },
-    excessIdling: 0,
-    harshBraking: 0,
-    speedViolation: 0,
-    travelTime: 0,
-    stopTime: 1,
-    remarks: "Under Maintenance",
-  },
-  {
-    company: "KE",
-    serial: 7,
-    object: "CN-2754",
-    ownership: "Own",
-    vendor: "KE",
-    trackerCompany: "Tracking World",
-    vehicleType: "Pickup",
-    group: "Distribution",
-    branch: "Region-I",
-    department: "IBC-SITE",
-    subDepartment: "IBC-SITE",
-    shiftHours: 24,
-    shiftTiming: "07:00 AM to 07:00 AM",
-    roadStatus: "On Road",
-    dayMetrics: {
-      "2016-09-01": { peak: 24.866, offPeak: "Parked", total: 24.866 },
-      "2016-09-02": { peak: 24.866, offPeak: "Parked", total: 24.866 },
-      "2016-09-03": { peak: 31.114, offPeak: "Parked", total: 31.114 },
-      "2016-09-04": { peak: 1.238, offPeak: "Parked", total: 1.238 },
-      "2016-09-05": { peak: 73.735, offPeak: 3.275, total: 77.01 },
-      "2016-09-06": { peak: 14.369, offPeak: "Parked", total: 14.369 },
-    },
-    excessIdling: 0,
-    harshBraking: 0,
-    speedViolation: 0,
-    travelTime: 0.024305555555555556,
-    stopTime: 0.9756944444444444,
-    remarks: "Reporting",
-  },
-  {
-    company: "KE",
-    serial: 8,
-    object: "CJ-9403",
-    ownership: "Own",
-    vendor: "KE",
-    trackerCompany: "Tracking World",
-    vehicleType: "Van",
-    group: "Supply Chain",
-    branch: "Supply Chain",
-    department: "Supply Chain",
-    subDepartment: "Fleet Management",
-    shiftHours: 24,
-    shiftTiming: "07:00 AM to 07:00 AM",
-    roadStatus: "On Road",
-    dayMetrics: {
-      "2016-09-01": { peak: 33.825, offPeak: "Parked", total: 33.825 },
-      "2016-09-02": { peak: 33.825, offPeak: "Parked", total: 33.825 },
-      "2016-09-03": { peak: 37.973, offPeak: 10.114, total: 48.087 },
-      "2016-09-04": { peak: "Parked", offPeak: 1.09, total: 1.09 },
-      "2016-09-05": { peak: 75.606, offPeak: 3.44, total: 79.046 },
-      "2016-09-06": { peak: 30.833, offPeak: 9.818, total: 40.651 },
-    },
-    excessIdling: 0,
-    harshBraking: 0,
-    speedViolation: 0,
-    travelTime: 0.05902777777777778,
-    stopTime: 0.9409722222222222,
-    remarks: "Reporting",
-  },
-  {
-    company: "KE",
-    serial: 9,
-    object: "CN-2368",
-    ownership: "Own",
-    vendor: "KE",
-    trackerCompany: "Tracking World",
-    vehicleType: "Pickup",
-    group: "Distribution",
-    branch: "Region-I",
-    department: "IBC-ORANGI-II",
-    subDepartment: "Orangi-II Revenue Protection & Recovery",
-    shiftHours: 24,
-    shiftTiming: "07:00 AM to 07:00 AM",
-    roadStatus: "On Road",
-    dayMetrics: {
-      "2016-09-01": { peak: 68.587, offPeak: 16.068, total: 84.655 },
-      "2016-09-02": { peak: 68.587, offPeak: 16.068, total: 84.655 },
-      "2016-09-03": { peak: 55.824, offPeak: 35.436, total: 91.26 },
-      "2016-09-04": { peak: 5.156, offPeak: 17.728, total: 22.884 },
-      "2016-09-05": { peak: 27.897, offPeak: 6.496, total: 34.393 },
-      "2016-09-06": { peak: 39.606, offPeak: 21.533, total: 61.139 },
-    },
-    excessIdling: 0,
-    harshBraking: 0,
-    speedViolation: 0,
-    travelTime: 0.08888888888888889,
-    stopTime: 0.9111111111111111,
-    remarks: "Reporting",
-  },
-  {
-    company: "KE",
-    serial: 10,
-    object: "CJ-0573",
-    ownership: "Own",
-    vendor: "KE",
-    trackerCompany: "Tracking World",
-    vehicleType: "Van",
-    group: "Distribution",
-    branch: "Region-II",
-    department: "IBC-HT-NW-R2",
-    subDepartment: "VIBC-HT-NW-Operation-R2",
-    shiftHours: 24,
-    shiftTiming: "07:00 AM to 07:00 AM",
-    roadStatus: "On Road",
-    dayMetrics: {
-      "2016-09-01": { peak: 31.686, offPeak: 10.297, total: 41.983 },
-      "2016-09-02": { peak: 31.686, offPeak: 10.297, total: 41.983 },
-      "2016-09-03": { peak: 28.431, offPeak: 10.519, total: 38.95 },
-      "2016-09-04": { peak: 1.51, offPeak: 5.015, total: 6.525 },
-      "2016-09-05": { peak: 49.617, offPeak: 1.138, total: 50.755 },
-      "2016-09-06": { peak: 7.766, offPeak: 2.003, total: 9.769 },
-    },
-    excessIdling: 0,
-    harshBraking: 0,
-    speedViolation: 0,
-    travelTime: 0.011805555555555555,
-    stopTime: 0.9881944444444445,
-    remarks: "Reporting",
-  },
-];
-
 const LEAD_COLUMNS = [
   { key: "serial", label: "S.No", width: "70px" },
   { key: "object", label: "Vehicle No.", width: "110px" },
   { key: "ownership", label: "Hired / Own", width: "96px" },
-  { key: "model", label: "Vendor", width: "88px" },
-  { key: "brand", label: "Tracker Company", width: "120px" },
+  { key: "vendor", label: "Vendor", width: "88px" },
+  { key: "trackerCompany", label: "Tracker Company", width: "120px" },
   { key: "vehicleType", label: "Category", width: "88px" },
   { key: "group", label: "Group", width: "110px" },
   { key: "branch", label: "BU / Function", width: "116px" },
@@ -362,7 +52,6 @@ const LEAD_COLUMNS = [
   { key: "shiftTiming", label: "Shift Timing", width: "150px" },
   { key: "roadStatus", label: "On / Off Road", width: "98px" },
 ];
-
 const SUMMARY_COLUMNS = [
   { key: "accumulatedPeak", label: "Accumulated KM's in Peak Hours", width: "120px" },
   { key: "accumulatedOffPeak", label: "Accumulated KM's in Off Hours", width: "120px" },
@@ -375,6 +64,11 @@ const SUMMARY_COLUMNS = [
   { key: "remarks", label: "Remarks", width: "220px" },
 ];
 
+function toNumericMetric(value) {
+  const numeric = Number(value);
+  return Number.isFinite(numeric) ? numeric : 0;
+}
+
 function getMonthLabel(monthValue) {
   const [year, month] = String(monthValue || REPORT_REFERENCE_MONTH)
     .split("-")
@@ -384,11 +78,6 @@ function getMonthLabel(monthValue) {
     month: "long",
     year: "numeric",
   });
-}
-
-function toNumericMetric(value) {
-  const numeric = Number(value);
-  return Number.isFinite(numeric) ? numeric : 0;
 }
 
 function compareValue(operator, source, target) {
@@ -432,6 +121,7 @@ function getMetricCellKind(value, subKey = "") {
     const normalized = value.trim().toLowerCase();
     if (normalized === "parked") return "status";
     if (normalized === "um") return "maintenance";
+    if (normalized === "tni" || normalized === "tr" || normalized === "tnr") return "maintenance";
     return "status";
   }
   if (!Number.isFinite(Number(value)) || Number(value) <= 0) return "zero";
@@ -440,46 +130,34 @@ function getMetricCellKind(value, subKey = "") {
 }
 
 function buildPreparedRows() {
-  return MIS_SOURCE_ROWS.map((row) => {
-    const dayMetrics = { ...row.dayMetrics };
-    const accumulatedPeak = MIS_DATE_GROUPS.reduce(
-      (sum, group) => sum + toNumericMetric(dayMetrics[group.key]?.peak),
-      0
-    );
-    const accumulatedOffPeak = MIS_DATE_GROUPS.reduce(
-      (sum, group) => sum + toNumericMetric(dayMetrics[group.key]?.offPeak),
-      0
-    );
-    const accumulatedTotal = MIS_DATE_GROUPS.reduce(
-      (sum, group) => sum + toNumericMetric(dayMetrics[group.key]?.total),
-      0
-    );
-
+  return DAYWISE_MIS_SOURCE_ROWS.map((row) => {
+    const dayMetrics = row.dayMetrics || {};
     return {
-      company: row.company,
-      serial: row.serial,
-      object: row.object,
-      ownership: row.ownership,
-      model: row.vendor,
-      brand: row.trackerCompany,
-      vehicleType: row.vehicleType,
-      group: row.group,
-      branch: row.branch,
-      department: row.department,
-      subDepartment: row.subDepartment,
-      shiftHours: row.shiftHours,
-      shiftTiming: row.shiftTiming,
-      roadStatus: row.roadStatus,
+      company: String(row.company || "KE"),
+      serial: String(row.serial || ""),
+      object: String(row.object || ""),
+      ownership: String(row.ownership || ""),
+      vendor: String(row.model || row.vendor || ""),
+      trackerCompany: String(row.brand || row.trackerCompany || ""),
+      vehicleType: String(row.vehicleType || ""),
+      group: String(row.group || ""),
+      branch: String(row.branch || ""),
+      department: String(row.department || ""),
+      subDepartment: String(row.subDepartment || ""),
+      shiftHours: String(row.shiftHours || ""),
+      shiftTiming: String(row.shiftTiming || ""),
+      roadStatus: String(row.roadStatus || ""),
       dayMetrics,
-      accumulatedPeak,
-      accumulatedOffPeak,
-      accumulatedTotal,
+      accumulatedPeak: row.accumulatedPeak,
+      accumulatedOffPeak: row.accumulatedOffPeak,
+      accumulatedTotal: row.accumulatedTotal,
       excessIdling: row.excessIdling,
       harshBraking: row.harshBraking,
       speedViolation: row.speedViolation,
       travelTime: row.travelTime,
       stopTime: row.stopTime,
-      remarks: row.remarks,
+      remarks: String(row.remarks || ""),
+      sortableAccumulatedTotal: toNumericMetric(row.accumulatedTotal),
     };
   });
 }
@@ -527,11 +205,12 @@ export default function DaywiseDistanceReportPage({
   const companyRef = useRef(null);
   const isMobileView = useReportPageMobileView();
   const [filters, setFilters] = useState(initialFiltersRef.current);
-  const [appliedRows, setAppliedRows] = useState(preparedRows);
-  const [statusText, setStatusText] = useState(
-    "Loaded dummy Daywise Distance MIS data modeled from the shared Excel sheet."
-  );
+  const [hasApplied, setHasApplied] = useState(false);
+  const [appliedRows, setAppliedRows] = useState([]);
+  const [statusText, setStatusText] = useState("");
   const [reportQuickScope, setReportQuickScope] = useState("All");
+  const [reportPageSize, setReportPageSize] = useState(50);
+  const [currentPage, setCurrentPage] = useState(1);
   const { ready, canView } = useMenuAccess(accessMenuKey);
 
   const isKeMode = mode === "ke";
@@ -552,11 +231,11 @@ export default function DaywiseDistanceReportPage({
     [preparedRows]
   );
   const trackerCompanyOptions = useMemo(
-    () => ["All", ...Array.from(new Set(preparedRows.map((row) => row.brand)))],
+    () => ["All", ...Array.from(new Set(preparedRows.map((row) => row.trackerCompany)))],
     [preparedRows]
   );
   const vendorOptions = useMemo(
-    () => ["All", ...Array.from(new Set(preparedRows.map((row) => row.model)))],
+    () => ["All", ...Array.from(new Set(preparedRows.map((row) => row.vendor)))],
     [preparedRows]
   );
 
@@ -619,11 +298,8 @@ export default function DaywiseDistanceReportPage({
     setFilters((current) => {
       const base = new Set(current.selectedObjects);
       visibleVehicles.forEach((object) => {
-        if (checked) {
-          base.add(object);
-        } else {
-          base.delete(object);
-        }
+        if (checked) base.add(object);
+        else base.delete(object);
       });
       return { ...current, selectedObjects: Array.from(base) };
     });
@@ -634,11 +310,8 @@ export default function DaywiseDistanceReportPage({
     setFilters((current) => {
       const base = new Set(current.selectedObjects);
       branchObjects.forEach((object) => {
-        if (checked) {
-          base.add(object);
-        } else {
-          base.delete(object);
-        }
+        if (checked) base.add(object);
+        else base.delete(object);
       });
       return { ...current, selectedObjects: Array.from(base) };
     });
@@ -652,14 +325,24 @@ export default function DaywiseDistanceReportPage({
       if (filters.branch !== "All" && row.branch !== filters.branch) return false;
       if (filters.vehicleGroup !== "All" && row.group !== filters.vehicleGroup) return false;
       if (filters.vehicleType !== "All" && row.vehicleType !== filters.vehicleType) return false;
-      if (filters.vehicleBrand !== "All" && row.brand !== filters.vehicleBrand) return false;
-      if (filters.vehicleModel !== "All" && row.model !== filters.vehicleModel) return false;
+      if (filters.vehicleBrand !== "All" && row.trackerCompany !== filters.vehicleBrand) return false;
+      if (filters.vehicleModel !== "All" && row.vendor !== filters.vehicleModel) return false;
       if (!selectedObjectSet.has(row.object)) return false;
-      if (!compareValue(filters.distanceOperator, row.accumulatedTotal, distanceTarget)) return false;
+      if (
+        !compareValue(
+          filters.distanceOperator,
+          row.sortableAccumulatedTotal,
+          distanceTarget
+        )
+      ) {
+        return false;
+      }
       return true;
     });
 
     setAppliedRows(nextRows);
+    setCurrentPage(1);
+    setHasApplied(true);
     setStatusText(
       nextStatus ||
         `${nextRows.length} record(s) loaded for ${getMonthLabel(filters.month)} in sheet-style Daywise MIS format.`
@@ -667,17 +350,19 @@ export default function DaywiseDistanceReportPage({
   };
 
   const handleSaveFilter = () => {
-    applyFilters("Daywise Distance filters applied to the MIS dummy dataset.");
+    applyFilters("Daywise Distance filters applied to the full sheet dummy dataset.");
   };
 
   const handleDeleteFilter = () => {
-    const nextFilters = buildInitialFilters(preparedRows);
-    setFilters(nextFilters);
-    setAppliedRows(preparedRows);
-    setStatusText("Daywise Distance filters reset to the default MIS dummy view.");
+    setFilters(buildInitialFilters(preparedRows));
+    setAppliedRows([]);
+    setCurrentPage(1);
+    setHasApplied(false);
+    setStatusText("");
   };
 
   const triggerUtilityAction = (label) => {
+    if (!hasApplied) return;
     setStatusText(`${label} is available in the Daywise Distance MIS workspace.`);
   };
 
@@ -688,17 +373,7 @@ export default function DaywiseDistanceReportPage({
     const dateHeaders = MIS_DATE_GROUPS.flatMap((group) =>
       MIS_SUB_COLUMNS.map((metric) => `${group.label} - ${metric.label}`)
     );
-    const tailHeaders = [
-      "Accumulated KM's in Peak Hours",
-      "Accumulated KM's in Off Hours",
-      "Accumulated KM's Total",
-      "Excess Idling",
-      "Harsh Braking",
-      "Speed Violation",
-      "Travel Time",
-      "Stop Time",
-      "Remarks",
-    ];
+    const tailHeaders = SUMMARY_COLUMNS.map((column) => column.label);
     return [...leadHeaders, ...dateHeaders, ...tailHeaders];
   }, []);
 
@@ -707,8 +382,8 @@ export default function DaywiseDistanceReportPage({
       row.serial,
       row.object,
       row.ownership,
-      row.model,
-      row.brand,
+      row.vendor,
+      row.trackerCompany,
       row.vehicleType,
       row.group,
       row.branch,
@@ -753,7 +428,9 @@ export default function DaywiseDistanceReportPage({
     }
 
     if (format === "XLS") {
-      const content = [exportHeaders.join("\t"), ...exportRows.map((row) => row.join("\t"))].join("\n");
+      const content = [exportHeaders.join("\t"), ...exportRows.map((row) => row.join("\t"))].join(
+        "\n"
+      );
       downloadFile("daywise-distance-mis.xls", content, "application/vnd.ms-excel");
       return;
     }
@@ -773,7 +450,37 @@ export default function DaywiseDistanceReportPage({
     printWindow.print();
   };
 
-  const footerRecordText = appliedRows.length ? `1-${appliedRows.length} (${appliedRows.length})` : "0-0 (0)";
+  const totalPages = Math.max(1, Math.ceil(appliedRows.length / reportPageSize));
+
+  useEffect(() => {
+    setCurrentPage((current) => Math.min(current, totalPages));
+  }, [totalPages]);
+
+  const pagedRows = useMemo(() => {
+    const startIndex = (currentPage - 1) * reportPageSize;
+    return appliedRows.slice(startIndex, startIndex + reportPageSize);
+  }, [appliedRows, currentPage, reportPageSize]);
+
+  const footerRecordText = useMemo(() => {
+    if (!appliedRows.length) return "0-0 (0)";
+    const startIndex = (currentPage - 1) * reportPageSize;
+    const endIndex = Math.min(startIndex + reportPageSize, appliedRows.length);
+    return `${startIndex + 1}-${endIndex} (${appliedRows.length})`;
+  }, [appliedRows, currentPage, reportPageSize]);
+
+  const handlePageSizeChange = (value) => {
+    const nextSize = Number(value);
+    if (!Number.isFinite(nextSize) || nextSize <= 0) return;
+    setReportPageSize(nextSize);
+    setCurrentPage(1);
+  };
+
+  const jumpToPage = (value) => {
+    const numeric = Number(value);
+    if (!Number.isFinite(numeric)) return;
+    const nextPage = Math.max(1, Math.min(totalPages, Math.trunc(numeric)));
+    setCurrentPage(nextPage);
+  };
 
   if (!ready && accessMenuKey) {
     return (
@@ -822,319 +529,274 @@ export default function DaywiseDistanceReportPage({
             <div className={styles.rangeText}>{rangeLabel}</div>
           </div>
           <div className={styles.headerActions}>
-            <button
-              type="button"
-              className={styles.iconButton}
-              onClick={() => triggerUtilityAction("Search")}
-              aria-label="Search"
-            >
+            <button type="button" className={styles.iconButton} onClick={() => triggerUtilityAction("Search")} aria-label="Search">
               <FaSearch />
             </button>
-            <button
-              type="button"
-              className={styles.iconButton}
-              onClick={() => triggerUtilityAction("Favorite")}
-              aria-label="Favorite"
-            >
+            <button type="button" className={styles.iconButton} onClick={() => triggerUtilityAction("Favorite")} aria-label="Favorite">
               <FaStar />
             </button>
-            <button
-              type="button"
-              className={styles.iconButton}
-              onClick={() => triggerUtilityAction("Filter")}
-              aria-label="Filter"
-            >
+            <button type="button" className={styles.iconButton} onClick={() => triggerUtilityAction("Filter")} aria-label="Filter">
               <FaFilter />
             </button>
-            <button
-              type="button"
-              className={styles.iconButton}
-              onClick={() => triggerUtilityAction("Calendar")}
-              aria-label="Calendar"
-            >
+            <button type="button" className={styles.iconButton} onClick={() => triggerUtilityAction("Calendar")} aria-label="Calendar">
               <FaCalendarAlt />
             </button>
-            <button
-              type="button"
-              className={styles.iconButton}
-              onClick={() => triggerUtilityAction("Settings")}
-              aria-label="Settings"
-            >
+            <button type="button" className={styles.iconButton} onClick={() => triggerUtilityAction("Settings")} aria-label="Settings">
               <FaCog />
             </button>
-            <button
-              type="button"
-              className={styles.iconButton}
-              onClick={() => triggerUtilityAction("Chart")}
-              aria-label="Chart"
-            >
+            <button type="button" className={styles.iconButton} onClick={() => triggerUtilityAction("Chart")} aria-label="Chart">
               <FaChartBar />
             </button>
-            <button
-              type="button"
-              className={styles.iconButton}
-              onClick={() => triggerUtilityAction("Help")}
-              aria-label="Help"
-            >
+            <button type="button" className={styles.iconButton} onClick={() => triggerUtilityAction("Help")} aria-label="Help">
               <FaQuestionCircle />
             </button>
           </div>
         </section>
 
-        <section className={`${styles.layout} ${styles.layoutResult}`}>
-          <div className={`${styles.resultsArea} ${styles.resultsAreaResult}`}>
-            <div className={styles.daywiseIntroCard}>
-              <div className={styles.daywiseIntroMeta}>
-                <span>
-                  <strong>CLIENT:</strong> KE
-                </span>
-                <span>
-                  <strong>REPORT PERIOD:</strong> {REPORT_PERIOD_LABEL}
-                </span>
-                <span>
-                  <strong>REPORTING DATE:</strong> {REPORTING_DATE_LABEL}
-                </span>
-              </div>
-              <div className={styles.daywiseIntroNotes}>
-                {SHEET_NOTES.map((note) => (
-                  <span key={note} className={styles.daywiseNoteChip}>
-                    {note}
-                  </span>
-                ))}
-              </div>
-            </div>
+        <section className={`${styles.layout} ${hasApplied ? styles.layoutResult : ""}`}>
+          {hasApplied ? (
+            <div className={`${styles.resultsArea} ${styles.resultsAreaResult}`}>
+              {statusText ? <div className={styles.statusBar}>{statusText}</div> : null}
 
-            {statusText ? <div className={styles.statusBar}>{statusText}</div> : null}
-
-            <div
-              className={`${styles.tableShell} ${styles.tableShellResult} ${styles.daywiseTableShellResult}`}
-            >
-              <div className={styles.tableScroller}>
-                <table
-                  className={`${styles.summaryTable} ${styles.summaryTableResult} ${styles.daywiseSummaryTable} ${styles.daywiseMisTable}`}
-                >
-                  <colgroup>
-                    {LEAD_COLUMNS.map((column) => (
-                      <col key={column.key} style={{ width: column.width }} />
-                    ))}
-                    {MIS_DATE_GROUPS.flatMap((group) =>
-                      MIS_SUB_COLUMNS.map((metric) => (
-                        <col
-                          key={`${group.key}-${metric.key}`}
-                          style={{ width: metric.key === "total" ? "108px" : "102px" }}
-                        />
-                      ))
-                    )}
-                    {SUMMARY_COLUMNS.map((column) => (
-                      <col key={column.key} style={{ width: column.width }} />
-                    ))}
-                  </colgroup>
-                  <thead>
-                    <tr>
+              <div
+                className={`${styles.tableShell} ${styles.tableShellResult} ${styles.daywiseTableShellResult}`}
+              >
+                <div className={styles.tableScroller}>
+                  <table
+                    className={`${styles.summaryTable} ${styles.summaryTableResult} ${styles.daywiseSummaryTable} ${styles.daywiseMisTable}`}
+                  >
+                    <colgroup>
                       {LEAD_COLUMNS.map((column) => (
-                        <th
-                          key={column.key}
-                          rowSpan={2}
-                          className={`${styles.daywiseStickyHeader} ${styles.daywiseLeadHeader}`}
-                        >
-                          {column.label}
-                        </th>
+                        <col key={column.key} style={{ width: column.width }} />
                       ))}
-                      {MIS_DATE_GROUPS.map((group, index) => (
-                        <th
-                          key={group.key}
-                          colSpan={MIS_SUB_COLUMNS.length}
-                          className={`${styles.daywiseStickyHeader} ${
-                            index === 0 ? styles.daywiseDateHeaderAccent : styles.daywiseDateHeader
-                          }`}
-                        >
-                          {group.label}
-                        </th>
-                      ))}
-                      {SUMMARY_COLUMNS.map((column, index) => (
-                        <th
-                          key={column.key}
-                          rowSpan={2}
-                          className={`${styles.daywiseStickyHeader} ${
-                            index < 3 ? styles.daywiseSummaryHeader : styles.daywiseMetricHeader
-                          }`}
-                        >
-                          {column.label}
-                        </th>
-                      ))}
-                    </tr>
-                    <tr>
-                      {MIS_DATE_GROUPS.flatMap((group, groupIndex) =>
+                      {MIS_DATE_GROUPS.flatMap((group) =>
                         MIS_SUB_COLUMNS.map((metric) => (
-                          <th
+                          <col
                             key={`${group.key}-${metric.key}`}
-                            className={`${styles.daywiseStickyHeader} ${
-                              groupIndex === 0
-                                ? styles.daywiseDateSubHeaderAccent
-                                : styles.daywiseDateSubHeader
-                            }`}
-                          >
-                            {metric.label}
-                          </th>
+                            style={{ width: metric.key === "total" ? "108px" : "102px" }}
+                          />
                         ))
                       )}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {appliedRows.length ? (
-                      appliedRows.map((row) => (
-                        <tr key={row.object} className={styles.activeMainRow}>
-                          {LEAD_COLUMNS.map((column) => (
-                            <td
-                              key={`${row.object}-${column.key}`}
-                              className={column.key === "serial" ? styles.numericCell : ""}
-                            >
-                              {row[column.key]}
-                            </td>
-                          ))}
-                          {MIS_DATE_GROUPS.flatMap((group) =>
-                            MIS_SUB_COLUMNS.map((metric) => {
-                              const value = row.dayMetrics[group.key]?.[metric.key];
-                              const kind = getMetricCellKind(value, metric.key);
-                              const cellClassName =
-                                kind === "maintenance"
-                                  ? styles.daywiseCellMaintenance
-                                  : kind === "status"
-                                  ? styles.daywiseCellStatus
-                                  : kind === "total"
-                                  ? styles.daywiseCellPeak
-                                  : kind === "active"
-                                  ? styles.daywiseCellActive
-                                  : styles.daywiseCellZero;
-                              return (
-                                <td
-                                  key={`${row.object}-${group.key}-${metric.key}`}
-                                  className={`${styles.numericCell} ${cellClassName}`}
-                                >
-                                  {formatDistanceMetric(value, filters.roundOff)}
-                                </td>
-                              );
-                            })
-                          )}
-                          <td className={`${styles.numericCell} ${styles.daywiseSummaryCell}`}>
-                            {formatDistanceMetric(row.accumulatedPeak, filters.roundOff)}
-                          </td>
-                          <td className={`${styles.numericCell} ${styles.daywiseSummaryCell}`}>
-                            {formatDistanceMetric(row.accumulatedOffPeak, filters.roundOff)}
-                          </td>
-                          <td className={`${styles.numericCell} ${styles.daywiseSummaryCell}`}>
-                            {formatDistanceMetric(row.accumulatedTotal, filters.roundOff)}
-                          </td>
-                          <td className={styles.numericCell}>{formatCountMetric(row.excessIdling)}</td>
-                          <td className={styles.numericCell}>{formatCountMetric(row.harshBraking)}</td>
-                          <td className={styles.numericCell}>{formatCountMetric(row.speedViolation)}</td>
-                          <td className={styles.numericCell}>{formatDurationMetric(row.travelTime)}</td>
-                          <td className={styles.numericCell}>{formatDurationMetric(row.stopTime)}</td>
-                          <td className={styles.daywiseRemarksCell}>{row.remarks}</td>
-                        </tr>
-                      ))
-                    ) : (
+                      {SUMMARY_COLUMNS.map((column) => (
+                        <col key={column.key} style={{ width: column.width }} />
+                      ))}
+                    </colgroup>
+                    <thead>
                       <tr>
-                        <td
-                          colSpan={
-                            LEAD_COLUMNS.length +
-                            MIS_DATE_GROUPS.length * MIS_SUB_COLUMNS.length +
-                            SUMMARY_COLUMNS.length
-                          }
-                          className={`${styles.noDataRow} ${styles.daywiseNoDataRow}`}
-                        >
-                          No Daywise Distance rows match the current filters.
-                        </td>
+                        {LEAD_COLUMNS.map((column) => (
+                          <th
+                            key={column.key}
+                            rowSpan={2}
+                            className={`${styles.daywiseStickyHeader} ${styles.daywiseLeadHeader}`}
+                          >
+                            {column.label}
+                          </th>
+                        ))}
+                        {MIS_DATE_GROUPS.map((group, index) => (
+                          <th
+                            key={group.key}
+                            colSpan={MIS_SUB_COLUMNS.length}
+                            className={`${styles.daywiseStickyHeader} ${
+                              index === 0 ? styles.daywiseDateHeaderAccent : styles.daywiseDateHeader
+                            }`}
+                          >
+                            {group.label}
+                          </th>
+                        ))}
+                        {SUMMARY_COLUMNS.map((column, index) => (
+                          <th
+                            key={column.key}
+                            rowSpan={2}
+                            className={`${styles.daywiseStickyHeader} ${
+                              index < 3 ? styles.daywiseSummaryHeader : styles.daywiseMetricHeader
+                            }`}
+                          >
+                            {column.label}
+                          </th>
+                        ))}
                       </tr>
-                    )}
-                  </tbody>
-                </table>
+                      <tr>
+                        {MIS_DATE_GROUPS.flatMap((group, groupIndex) =>
+                          MIS_SUB_COLUMNS.map((metric) => (
+                            <th
+                              key={`${group.key}-${metric.key}`}
+                              className={`${styles.daywiseStickyHeader} ${
+                                groupIndex === 0
+                                  ? styles.daywiseDateSubHeaderAccent
+                                  : styles.daywiseDateSubHeader
+                              }`}
+                            >
+                              {metric.label}
+                            </th>
+                          ))
+                        )}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {pagedRows.length ? (
+                        pagedRows.map((row) => (
+                          <tr key={`${row.serial}-${row.object}`} className={styles.activeMainRow}>
+                            {LEAD_COLUMNS.map((column) => (
+                              <td
+                                key={`${row.object}-${column.key}`}
+                                className={column.key === "serial" ? styles.numericCell : ""}
+                              >
+                                {row[column.key]}
+                              </td>
+                            ))}
+                            {MIS_DATE_GROUPS.flatMap((group) =>
+                              MIS_SUB_COLUMNS.map((metric) => {
+                                const value = row.dayMetrics[group.key]?.[metric.key];
+                                const kind = getMetricCellKind(value, metric.key);
+                                const cellClassName =
+                                  kind === "maintenance"
+                                    ? styles.daywiseCellMaintenance
+                                    : kind === "status"
+                                    ? styles.daywiseCellStatus
+                                    : kind === "total"
+                                    ? styles.daywiseCellPeak
+                                    : kind === "active"
+                                    ? styles.daywiseCellActive
+                                    : styles.daywiseCellZero;
+                                return (
+                                  <td
+                                    key={`${row.object}-${group.key}-${metric.key}`}
+                                    className={`${styles.numericCell} ${cellClassName}`}
+                                  >
+                                    {formatDistanceMetric(value, filters.roundOff)}
+                                  </td>
+                                );
+                              })
+                            )}
+                            <td className={`${styles.numericCell} ${styles.daywiseSummaryCell}`}>
+                              {formatDistanceMetric(row.accumulatedPeak, filters.roundOff)}
+                            </td>
+                            <td className={`${styles.numericCell} ${styles.daywiseSummaryCell}`}>
+                              {formatDistanceMetric(row.accumulatedOffPeak, filters.roundOff)}
+                            </td>
+                            <td className={`${styles.numericCell} ${styles.daywiseSummaryCell}`}>
+                              {formatDistanceMetric(row.accumulatedTotal, filters.roundOff)}
+                            </td>
+                            <td className={styles.numericCell}>{formatCountMetric(row.excessIdling)}</td>
+                            <td className={styles.numericCell}>{formatCountMetric(row.harshBraking)}</td>
+                            <td className={styles.numericCell}>{formatCountMetric(row.speedViolation)}</td>
+                            <td className={styles.numericCell}>{formatDurationMetric(row.travelTime)}</td>
+                            <td className={styles.numericCell}>{formatDurationMetric(row.stopTime)}</td>
+                            <td className={styles.daywiseRemarksCell}>{row.remarks}</td>
+                          </tr>
+                        ))
+                      ) : (
+                        <tr>
+                          <td
+                            colSpan={
+                              LEAD_COLUMNS.length +
+                              MIS_DATE_GROUPS.length * MIS_SUB_COLUMNS.length +
+                              SUMMARY_COLUMNS.length
+                            }
+                            className={`${styles.noDataRow} ${styles.daywiseNoDataRow}`}
+                          >
+                            No Daywise Distance rows match the current filters.
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
               </div>
-            </div>
 
-            <div className={styles.reportFooter}>
-              <div className={styles.reportFooterLeft}>
-                <button
-                  type="button"
-                  className={styles.reportToolButton}
-                  onClick={() => applyFilters("Daywise Distance MIS refreshed.")}
-                  aria-label="Refresh result"
-                >
-                  <FaSyncAlt size={14} />
-                </button>
-                <button
-                  type="button"
-                  className={styles.reportToolLabelButton}
-                  onClick={() => handleExport("XLS")}
-                  aria-label="Export XLS"
-                >
-                  <FaSyncAlt size={12} />
-                  <span>XLS</span>
-                </button>
-                <button
-                  type="button"
-                  className={styles.reportToolLabelButton}
-                  onClick={() => handleExport("PDF")}
-                  aria-label="Export PDF"
-                >
-                  <FaPrint size={12} />
-                  <span>PDF</span>
-                </button>
-              </div>
-              <div className={styles.reportFooterCenter}>
-                <input type="text" className={styles.reportSearchInput} />
-                <select
-                  className={styles.reportScopeSelect}
-                  value={reportQuickScope}
-                  onChange={(event) => setReportQuickScope(event.target.value)}
-                >
-                  <option value="All">All</option>
-                  <option value="Vehicle">Vehicle</option>
-                  <option value="BU">BU / Function</option>
-                </select>
-                <button
-                  type="button"
-                  className={styles.reportFooterSearchButton}
-                  aria-label="Search results"
-                  onClick={() => triggerUtilityAction("Result search")}
-                >
-                  <FaSearch size={16} />
-                </button>
-              </div>
-              <div className={styles.reportFooterRight}>
-                <select className={styles.reportMiniSelect} defaultValue="20">
-                  <option value="20">20</option>
-                  <option value="50">50</option>
-                  <option value="100">100</option>
-                </select>
-                <div className={styles.reportPager}>
+              <div className={styles.reportFooter}>
+                <div className={styles.reportFooterLeft}>
                   <button
                     type="button"
-                    className={styles.reportPagerButton}
-                    aria-label="Previous page"
+                    className={styles.reportToolButton}
+                    onClick={() => applyFilters("Daywise Distance MIS refreshed.")}
+                    aria-label="Refresh result"
                   >
-                    {"<"}
+                    <FaSyncAlt size={14} />
                   </button>
-                  <span className={styles.reportPagerCurrent}>1</span>
-                  <button type="button" className={styles.reportPagerButton} aria-label="Next page">
-                    {">"}
+                  <button type="button" className={styles.reportToolLabelButton} onClick={() => handleExport("XLS")} aria-label="Export XLS">
+                    <FaSyncAlt size={12} />
+                    <span>XLS</span>
+                  </button>
+                  <button type="button" className={styles.reportToolLabelButton} onClick={() => handleExport("PDF")} aria-label="Export PDF">
+                    <FaPrint size={12} />
+                    <span>PDF</span>
                   </button>
                 </div>
-                <div className={styles.reportCount}>{footerRecordText}</div>
+                <div className={styles.reportFooterCenter}>
+                  <input type="text" className={styles.reportSearchInput} />
+                  <select
+                    className={styles.reportScopeSelect}
+                    value={reportQuickScope}
+                    onChange={(event) => setReportQuickScope(event.target.value)}
+                  >
+                    <option value="All">All</option>
+                    <option value="Vehicle">Vehicle</option>
+                    <option value="BU">BU / Function</option>
+                  </select>
+                  <button
+                    type="button"
+                    className={styles.reportFooterSearchButton}
+                    aria-label="Search results"
+                    onClick={() => triggerUtilityAction("Result search")}
+                  >
+                    <FaSearch size={16} />
+                  </button>
+                </div>
+                <div className={styles.reportFooterRight}>
+                  <select
+                    className={styles.reportMiniSelect}
+                    value={String(reportPageSize)}
+                    onChange={(event) => handlePageSizeChange(event.target.value)}
+                  >
+                    {PAGE_SIZE_OPTIONS.map((size) => (
+                      <option key={size} value={size}>
+                        {size}
+                      </option>
+                    ))}
+                  </select>
+                  <div className={styles.reportPager}>
+                    <button
+                      type="button"
+                      className={styles.reportPagerButton}
+                      aria-label="Previous page"
+                      onClick={() => setCurrentPage((current) => Math.max(1, current - 1))}
+                      disabled={currentPage <= 1}
+                    >
+                      {"<"}
+                    </button>
+                    <input
+                      type="number"
+                      min={1}
+                      max={totalPages}
+                      className={styles.reportPagerCurrent}
+                      value={currentPage}
+                      onChange={(event) => jumpToPage(event.target.value)}
+                      aria-label="Current page"
+                    />
+                    <button
+                      type="button"
+                      className={styles.reportPagerButton}
+                      aria-label="Next page"
+                      onClick={() => setCurrentPage((current) => Math.min(totalPages, current + 1))}
+                      disabled={currentPage >= totalPages}
+                    >
+                      {">"}
+                    </button>
+                  </div>
+                  <div className={styles.reportCount}>{footerRecordText}</div>
+                </div>
               </div>
             </div>
-          </div>
+          ) : null}
 
+          {!hasApplied ? (
           <aside className={styles.filterPanel}>
             <div className={styles.filterGrid}>
               <div className={styles.filterColumn}>
                 <div className={styles.filterBlock}>
                   <label className={styles.filterLabel}>Company :</label>
-                  <select
-                    className={styles.filterControl}
-                    value={filters.company}
-                    onChange={(event) => handleFilterChange("company", event.target.value)}
-                  >
+                  <select className={styles.filterControl} value={filters.company} onChange={(event) => handleFilterChange("company", event.target.value)}>
                     {companyOptions.map((option) => (
                       <option key={option} value={option}>
                         {option}
@@ -1145,11 +807,7 @@ export default function DaywiseDistanceReportPage({
 
                 <div className={styles.filterBlock}>
                   <label className={styles.filterLabel}>BU / Function :</label>
-                  <select
-                    className={styles.filterControl}
-                    value={filters.branch}
-                    onChange={(event) => handleFilterChange("branch", event.target.value)}
-                  >
+                  <select className={styles.filterControl} value={filters.branch} onChange={(event) => handleFilterChange("branch", event.target.value)}>
                     {branchOptions.map((option) => (
                       <option key={option} value={option}>
                         {option}
@@ -1160,11 +818,7 @@ export default function DaywiseDistanceReportPage({
 
                 <div className={styles.filterBlock}>
                   <label className={styles.filterLabel}>Group :</label>
-                  <select
-                    className={styles.filterControl}
-                    value={filters.vehicleGroup}
-                    onChange={(event) => handleFilterChange("vehicleGroup", event.target.value)}
-                  >
+                  <select className={styles.filterControl} value={filters.vehicleGroup} onChange={(event) => handleFilterChange("vehicleGroup", event.target.value)}>
                     {vehicleGroupOptions.map((option) => (
                       <option key={option} value={option}>
                         {option}
@@ -1175,11 +829,7 @@ export default function DaywiseDistanceReportPage({
 
                 <div className={styles.filterBlock}>
                   <label className={styles.filterLabel}>Category :</label>
-                  <select
-                    className={styles.filterControl}
-                    value={filters.vehicleType}
-                    onChange={(event) => handleFilterChange("vehicleType", event.target.value)}
-                  >
+                  <select className={styles.filterControl} value={filters.vehicleType} onChange={(event) => handleFilterChange("vehicleType", event.target.value)}>
                     {vehicleTypeOptions.map((option) => (
                       <option key={option} value={option}>
                         {option}
@@ -1190,11 +840,7 @@ export default function DaywiseDistanceReportPage({
 
                 <div className={styles.filterBlock}>
                   <label className={styles.filterLabel}>Tracker Company :</label>
-                  <select
-                    className={styles.filterControl}
-                    value={filters.vehicleBrand}
-                    onChange={(event) => handleFilterChange("vehicleBrand", event.target.value)}
-                  >
+                  <select className={styles.filterControl} value={filters.vehicleBrand} onChange={(event) => handleFilterChange("vehicleBrand", event.target.value)}>
                     {trackerCompanyOptions.map((option) => (
                       <option key={option} value={option}>
                         {option}
@@ -1205,11 +851,7 @@ export default function DaywiseDistanceReportPage({
 
                 <div className={styles.filterBlock}>
                   <label className={styles.filterLabel}>Vendor :</label>
-                  <select
-                    className={styles.filterControl}
-                    value={filters.vehicleModel}
-                    onChange={(event) => handleFilterChange("vehicleModel", event.target.value)}
-                  >
+                  <select className={styles.filterControl} value={filters.vehicleModel} onChange={(event) => handleFilterChange("vehicleModel", event.target.value)}>
                     {vendorOptions.map((option) => (
                       <option key={option} value={option}>
                         {option}
@@ -1220,13 +862,7 @@ export default function DaywiseDistanceReportPage({
 
                 <div className={styles.filterBlock}>
                   <label className={styles.filterLabel}>Accumulated Distance :</label>
-                  <select
-                    className={styles.filterControl}
-                    value={filters.distanceOperator}
-                    onChange={(event) =>
-                      handleFilterChange("distanceOperator", event.target.value)
-                    }
-                  >
+                  <select className={styles.filterControl} value={filters.distanceOperator} onChange={(event) => handleFilterChange("distanceOperator", event.target.value)}>
                     {OPERATOR_OPTIONS.map((option) => (
                       <option key={option} value={option}>
                         {option}
@@ -1247,9 +883,7 @@ export default function DaywiseDistanceReportPage({
                     <input
                       type="checkbox"
                       checked={Boolean(filters.roundOff)}
-                      onChange={(event) =>
-                        handleFilterChange("roundOff", event.target.checked)
-                      }
+                      onChange={(event) => handleFilterChange("roundOff", event.target.checked)}
                     />
                     <span>Round Off</span>
                   </label>
@@ -1280,9 +914,7 @@ export default function DaywiseDistanceReportPage({
                     <input
                       type="checkbox"
                       checked={Boolean(filters.timeRangeEnabled)}
-                      onChange={(event) =>
-                        handleFilterChange("timeRangeEnabled", event.target.checked)
-                      }
+                      onChange={(event) => handleFilterChange("timeRangeEnabled", event.target.checked)}
                     />
                     <span>Time Range</span>
                   </label>
@@ -1314,9 +946,7 @@ export default function DaywiseDistanceReportPage({
                       <input
                         type="text"
                         value={filters.objectSearch}
-                        onChange={(event) =>
-                          handleFilterChange("objectSearch", event.target.value)
-                        }
+                        onChange={(event) => handleFilterChange("objectSearch", event.target.value)}
                         className={styles.searchInput}
                         placeholder="Search"
                       />
@@ -1324,7 +954,7 @@ export default function DaywiseDistanceReportPage({
                     <button
                       type="button"
                       className={styles.refreshTreeButton}
-                      onClick={() => setStatusText("Vehicle tree refreshed.")}
+                      onClick={() => setStatusText(hasApplied ? "Vehicle tree refreshed." : "")}
                       aria-label="Reload vehicles"
                     >
                       <FaSyncAlt size={11} />
@@ -1352,18 +982,13 @@ export default function DaywiseDistanceReportPage({
                             <input
                               type="checkbox"
                               checked={branchChecked}
-                              onChange={(event) =>
-                                toggleBranchObjects(branch, event.target.checked)
-                              }
+                              onChange={(event) => toggleBranchObjects(branch, event.target.checked)}
                             />
                             <span>{branch}</span>
                           </label>
                           <div className={styles.treeChildren}>
                             {objects.map((object) => (
-                              <label
-                                key={object}
-                                className={`${styles.checkRow} ${styles.treeLevel2}`}
-                              >
+                              <label key={`${branch}-${object}`} className={`${styles.checkRow} ${styles.treeLevel2}`}>
                                 <input
                                   type="checkbox"
                                   checked={filters.selectedObjects.includes(object)}
@@ -1382,52 +1007,29 @@ export default function DaywiseDistanceReportPage({
 
               <div className={styles.filterActions}>
                 <div className={styles.buttonGrid}>
-                  <button
-                    type="button"
-                    className={`${styles.footerButton} ${styles.secondaryActionButton}`}
-                    onClick={handleSaveFilter}
-                  >
+                  <button type="button" className={`${styles.footerButton} ${styles.secondaryActionButton}`} onClick={handleSaveFilter}>
                     Save Filter
                   </button>
-                  <button
-                    type="button"
-                    className={`${styles.footerButton} ${styles.dangerActionButton}`}
-                    onClick={handleDeleteFilter}
-                  >
+                  <button type="button" className={`${styles.footerButton} ${styles.dangerActionButton}`} onClick={handleDeleteFilter}>
                     Delete Filter
                   </button>
-                  <button
-                    type="button"
-                    className={`${styles.footerButton} ${styles.primaryActionButton}`}
-                    onClick={() => applyFilters()}
-                  >
+                  <button type="button" className={`${styles.footerButton} ${styles.primaryActionButton}`} onClick={() => applyFilters()}>
                     Apply
                   </button>
-                  <button
-                    type="button"
-                    className={`${styles.footerButton} ${styles.exportActionButton}`}
-                    onClick={() => handleExport("XLS")}
-                  >
+                  <button type="button" className={`${styles.footerButton} ${styles.exportActionButton}`} onClick={() => handleExport("XLS")}>
                     XLS
                   </button>
-                  <button
-                    type="button"
-                    className={`${styles.footerButton} ${styles.exportActionButton}`}
-                    onClick={() => handleExport("PDF")}
-                  >
+                  <button type="button" className={`${styles.footerButton} ${styles.exportActionButton}`} onClick={() => handleExport("PDF")}>
                     PDF
                   </button>
-                  <button
-                    type="button"
-                    className={`${styles.footerButton} ${styles.exportActionButton}`}
-                    onClick={() => handleExport("CSV")}
-                  >
+                  <button type="button" className={`${styles.footerButton} ${styles.exportActionButton}`} onClick={() => handleExport("CSV")}>
                     CSV
                   </button>
                 </div>
               </div>
             </div>
           </aside>
+          ) : null}
         </section>
       </main>
     </>
