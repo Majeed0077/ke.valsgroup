@@ -177,16 +177,13 @@ function LoginPageContent() {
           </div>
 
           <div className={`${styles.formContainer} ${styles.loginSingleCard}`}>
-            <div className={styles.authTabs} role="tablist" aria-label="Authentication">
+            <div className={`${styles.authTabs} ${styles.authTabsSingle}`} role="tablist" aria-label="Authentication">
               <Link
                 href="/login"
                 className={`${styles.authTab} ${styles.authTabActive}`}
                 aria-current="page"
               >
                 Login
-              </Link>
-              <Link href="/signup" className={styles.authTab}>
-                Sign Up
               </Link>
             </div>
 
@@ -298,9 +295,6 @@ function LoginPageContent() {
                 <div className={styles.links}>
                   <Link href="/forgot-password" className={styles.link}>
                     Forgot Password?
-                  </Link>
-                  <Link href="/signup" className={styles.link}>
-                    Don&apos;t have an account? Sign Up
                   </Link>
                 </div>
 

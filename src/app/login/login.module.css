@@ -1681,6 +1681,10 @@
   border-bottom: 1px solid var(--ke-border);
 }
 
+.authTabsSingle {
+  grid-template-columns: minmax(0, 1fr);
+}
+
 .authTab {
   position: relative;
   min-height: 58px;

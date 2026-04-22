@@ -1167,9 +1167,6 @@ const Header = ({
             <Link href="/login" className={styles.signInLink}>
               Sign In
             </Link>
-            <Link href="/signup" className={styles.loginButton}>
-              Sign Up
-            </Link>
           </>
         ) : null}
       </div>

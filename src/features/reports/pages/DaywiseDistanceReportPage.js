@@ -20,18 +20,9 @@ import styles from "./TravelSummaryReportPage.module.css";
 import keLogo from "../../../../public/icons/KE.webp";
 import { DAYWISE_MIS_SOURCE_ROWS } from "./daywiseDistanceMisDummyData";
 
-const REPORT_REFERENCE_MONTH = "2016-09";
-const REPORT_PERIOD_LABEL = "01-Sep-2016 to 06-Sep-2016";
+const DEFAULT_DISPLAY_DAY_COUNT = 6;
 const OPERATOR_OPTIONS = ["Greater Than", "Less Than", "Equal To"];
 const PAGE_SIZE_OPTIONS = [20, 50, 100, 200];
-const MIS_DATE_GROUPS = [
-  { key: "2016-09-01", label: "01-Sep-2016" },
-  { key: "2016-09-02", label: "02-Sep-2016" },
-  { key: "2016-09-03", label: "03-Sep-2016" },
-  { key: "2016-09-04", label: "04-Sep-2016" },
-  { key: "2016-09-05", label: "05-Sep-2016" },
-  { key: "2016-09-06", label: "06-Sep-2016" },
-];
 const MIS_SUB_COLUMNS = [
   { key: "peak", label: "KM's Driven Peak" },
   { key: "offPeak", label: "KM's Driven Off Peak" },
@@ -69,11 +60,49 @@ function toNumericMetric(value) {
   return Number.isFinite(numeric) ? numeric : 0;
 }
 
-function getMonthLabel(monthValue) {
-  const [year, month] = String(monthValue || REPORT_REFERENCE_MONTH)
+function padDatePart(value) {
+  return String(value).padStart(2, "0");
+}
+
+function getCurrentMonthValue() {
+  const today = new Date();
+  return `${today.getFullYear()}-${padDatePart(today.getMonth() + 1)}`;
+}
+
+function parseMonthValue(monthValue) {
+  const [year, month] = String(monthValue || getCurrentMonthValue())
     .split("-")
     .map((value) => Number(value) || 0);
-  const monthDate = new Date(year || 2016, Math.max(0, (month || 1) - 1), 1);
+  return {
+    year: year || new Date().getFullYear(),
+    month: month || 1,
+  };
+}
+
+function formatMisDateLabel(date) {
+  return date
+    .toLocaleDateString("en-GB", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    })
+    .replace(/ /g, "-");
+}
+
+function buildMisDateGroups(monthValue, dayCount = DEFAULT_DISPLAY_DAY_COUNT) {
+  const { year, month } = parseMonthValue(monthValue);
+  return Array.from({ length: dayCount }, (_, index) => {
+    const date = new Date(year, Math.max(0, month - 1), index + 1);
+    return {
+      key: `${year}-${padDatePart(month)}-${padDatePart(index + 1)}`,
+      label: formatMisDateLabel(date),
+    };
+  });
+}
+
+function getMonthLabel(monthValue) {
+  const { year, month } = parseMonthValue(monthValue);
+  const monthDate = new Date(year, Math.max(0, month - 1), 1);
   return monthDate.toLocaleString("en-US", {
     month: "long",
     year: "numeric",
@@ -88,14 +117,32 @@ function compareValue(operator, source, target) {
 }
 
 function formatDistanceMetric(value, roundOff = false) {
-  if (typeof value === "string" && value.trim()) return value;
-  const numeric = Number(value);
+  if (value === null || value === undefined) return "-";
+  const trimmedValue = typeof value === "string" ? value.trim() : value;
+  const numeric = Number(trimmedValue);
   if (!Number.isFinite(numeric)) return "-";
   if (roundOff) return Math.round(numeric).toLocaleString("en-US");
   return numeric.toLocaleString("en-US", {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
+    minimumFractionDigits: 1,
+    maximumFractionDigits: 1,
   });
+}
+
+function formatDistanceOrStatus(value, roundOff = false) {
+  if (typeof value === "string") {
+    const trimmedValue = value.trim();
+    if (!trimmedValue) return "-";
+    const numeric = Number(trimmedValue);
+    if (!Number.isFinite(numeric)) return trimmedValue;
+  }
+  return formatDistanceMetric(value, roundOff);
+}
+
+function normalizeTrackerCompany(value) {
+  const normalized = String(value || "").trim();
+  if (!normalized) return "";
+  if (normalized.toLowerCase() === "tracking world") return "Vals Tracking";
+  return normalized;
 }
 
 function formatCountMetric(value) {
@@ -119,6 +166,12 @@ function formatDurationMetric(value) {
 function getMetricCellKind(value, subKey = "") {
   if (typeof value === "string") {
     const normalized = value.trim().toLowerCase();
+    const numeric = Number(normalized);
+    if (Number.isFinite(numeric)) {
+      if (numeric <= 0) return "zero";
+      if (subKey === "total") return "total";
+      return "active";
+    }
     if (normalized === "parked") return "status";
     if (normalized === "um") return "maintenance";
     if (normalized === "tni" || normalized === "tr" || normalized === "tnr") return "maintenance";
@@ -132,14 +185,15 @@ function getMetricCellKind(value, subKey = "") {
 function buildPreparedRows() {
   return DAYWISE_MIS_SOURCE_ROWS.map((row) => {
     const dayMetrics = row.dayMetrics || {};
+    const dayMetricList = Object.values(dayMetrics);
     return {
       company: String(row.company || "KE"),
       serial: String(row.serial || ""),
       object: String(row.object || ""),
       ownership: String(row.ownership || ""),
       vendor: String(row.model || row.vendor || ""),
-      trackerCompany: String(row.brand || row.trackerCompany || ""),
-      vehicleType: String(row.vehicleType || ""),
+      trackerCompany: normalizeTrackerCompany(row.brand || row.trackerCompany || ""),
+      vehicleType: String(row.vehicleType || row.category || ""),
       group: String(row.group || ""),
       branch: String(row.branch || ""),
       department: String(row.department || ""),
@@ -147,7 +201,7 @@ function buildPreparedRows() {
       shiftHours: String(row.shiftHours || ""),
       shiftTiming: String(row.shiftTiming || ""),
       roadStatus: String(row.roadStatus || ""),
-      dayMetrics,
+      dayMetricList,
       accumulatedPeak: row.accumulatedPeak,
       accumulatedOffPeak: row.accumulatedOffPeak,
       accumulatedTotal: row.accumulatedTotal,
@@ -165,7 +219,7 @@ function buildPreparedRows() {
 function buildInitialFilters(rows) {
   return {
     company: "All",
-    month: REPORT_REFERENCE_MONTH,
+    month: getCurrentMonthValue(),
     includeDays: true,
     timeRangeEnabled: false,
     startTime: "07:00 AM",
@@ -212,6 +266,21 @@ export default function DaywiseDistanceReportPage({
   const [reportPageSize, setReportPageSize] = useState(50);
   const [currentPage, setCurrentPage] = useState(1);
   const { ready, canView } = useMenuAccess(accessMenuKey);
+  const misDateGroups = useMemo(
+    () => buildMisDateGroups(filters.month, DEFAULT_DISPLAY_DAY_COUNT),
+    [filters.month]
+  );
+  const rangeLabel = useMemo(() => {
+    if (!misDateGroups.length) return `${getMonthLabel(filters.month)} MIS`;
+    return `${misDateGroups[0].label} to ${
+      misDateGroups[misDateGroups.length - 1].label
+    } • ${getMonthLabel(filters.month)} MIS`;
+  }, [filters.month, misDateGroups]);
+
+  const displayRangeLabel = useMemo(
+    () => rangeLabel.replace(/â€¢|•/g, "|"),
+    [rangeLabel]
+  );
 
   const isKeMode = mode === "ke";
   const companyOptions = useMemo(
@@ -366,16 +435,15 @@ export default function DaywiseDistanceReportPage({
     setStatusText(`${label} is available in the Daywise Distance MIS workspace.`);
   };
 
-  const rangeLabel = `${REPORT_PERIOD_LABEL} • ${getMonthLabel(filters.month)} MIS`;
 
   const exportHeaders = useMemo(() => {
     const leadHeaders = LEAD_COLUMNS.map((column) => column.label);
-    const dateHeaders = MIS_DATE_GROUPS.flatMap((group) =>
+    const dateHeaders = misDateGroups.flatMap((group) =>
       MIS_SUB_COLUMNS.map((metric) => `${group.label} - ${metric.label}`)
     );
     const tailHeaders = SUMMARY_COLUMNS.map((column) => column.label);
     return [...leadHeaders, ...dateHeaders, ...tailHeaders];
-  }, []);
+  }, [misDateGroups]);
 
   const exportRows = useMemo(() => {
     return appliedRows.map((row) => [
@@ -392,12 +460,12 @@ export default function DaywiseDistanceReportPage({
       row.shiftHours,
       row.shiftTiming,
       row.roadStatus,
-      ...MIS_DATE_GROUPS.flatMap((group) => {
-        const metrics = row.dayMetrics[group.key] || {};
+      ...misDateGroups.flatMap((group, groupIndex) => {
+        const metrics = row.dayMetricList[groupIndex] || {};
         return [
-          formatDistanceMetric(metrics.peak, filters.roundOff),
-          formatDistanceMetric(metrics.offPeak, filters.roundOff),
-          formatDistanceMetric(metrics.total, filters.roundOff),
+          formatDistanceOrStatus(metrics.peak, filters.roundOff),
+          formatDistanceOrStatus(metrics.offPeak, filters.roundOff),
+          formatDistanceOrStatus(metrics.total, filters.roundOff),
         ];
       }),
       formatDistanceMetric(row.accumulatedPeak, filters.roundOff),
@@ -410,7 +478,7 @@ export default function DaywiseDistanceReportPage({
       formatDurationMetric(row.stopTime),
       row.remarks,
     ]);
-  }, [appliedRows, filters.roundOff]);
+  }, [appliedRows, filters.roundOff, misDateGroups]);
 
   const handleExport = (format) => {
     if (!appliedRows.length) {
@@ -441,7 +509,7 @@ export default function DaywiseDistanceReportPage({
     const printWindow = window.open("", "_blank", "width=1440,height=900");
     if (!printWindow) return;
     printWindow.document.write(
-      `<html><head><title>Daywise Distance MIS</title><style>body{font-family:Arial,sans-serif;padding:18px;color:#111}table{width:100%;border-collapse:collapse;font-size:11px}th,td{border:1px solid #8f9aa5;padding:4px 6px;text-align:left;vertical-align:top}th{background:#d4d9de}h1{margin-bottom:6px}p{margin:4px 0 14px}</style></head><body><h1>Daywise Distance MIS</h1><p>${rangeLabel}</p><table><thead><tr>${exportHeaders
+      `<html><head><title>Daywise Distance MIS</title><style>body{font-family:Arial,sans-serif;padding:18px;color:#111}table{width:100%;border-collapse:collapse;font-size:11px}th,td{border:1px solid #8f9aa5;padding:4px 6px;text-align:left;vertical-align:top}th{background:#d4d9de}h1{margin-bottom:6px}p{margin:4px 0 14px}</style></head><body><h1>Daywise Distance MIS</h1><p>${displayRangeLabel}</p><table><thead><tr>${exportHeaders
         .map((header) => `<th>${header}</th>`)
         .join("")}</tr></thead><tbody>${rowsHtml}</tbody></table></body></html>`
     );
@@ -526,7 +594,7 @@ export default function DaywiseDistanceReportPage({
               <FaStar className={styles.titleIcon} />
               <h1>Daywise Distance</h1>
             </div>
-            <div className={styles.rangeText}>{rangeLabel}</div>
+            <div className={styles.rangeText}>{displayRangeLabel}</div>
           </div>
           <div className={styles.headerActions}>
             <button type="button" className={styles.iconButton} onClick={() => triggerUtilityAction("Search")} aria-label="Search">
@@ -569,7 +637,7 @@ export default function DaywiseDistanceReportPage({
                       {LEAD_COLUMNS.map((column) => (
                         <col key={column.key} style={{ width: column.width }} />
                       ))}
-                      {MIS_DATE_GROUPS.flatMap((group) =>
+                      {misDateGroups.flatMap((group) =>
                         MIS_SUB_COLUMNS.map((metric) => (
                           <col
                             key={`${group.key}-${metric.key}`}
@@ -592,7 +660,7 @@ export default function DaywiseDistanceReportPage({
                             {column.label}
                           </th>
                         ))}
-                        {MIS_DATE_GROUPS.map((group, index) => (
+                        {misDateGroups.map((group, index) => (
                           <th
                             key={group.key}
                             colSpan={MIS_SUB_COLUMNS.length}
@@ -616,7 +684,7 @@ export default function DaywiseDistanceReportPage({
                         ))}
                       </tr>
                       <tr>
-                        {MIS_DATE_GROUPS.flatMap((group, groupIndex) =>
+                        {misDateGroups.flatMap((group, groupIndex) =>
                           MIS_SUB_COLUMNS.map((metric) => (
                             <th
                               key={`${group.key}-${metric.key}`}
@@ -644,9 +712,9 @@ export default function DaywiseDistanceReportPage({
                                 {row[column.key]}
                               </td>
                             ))}
-                            {MIS_DATE_GROUPS.flatMap((group) =>
+                            {misDateGroups.flatMap((group, groupIndex) =>
                               MIS_SUB_COLUMNS.map((metric) => {
-                                const value = row.dayMetrics[group.key]?.[metric.key];
+                                const value = row.dayMetricList[groupIndex]?.[metric.key];
                                 const kind = getMetricCellKind(value, metric.key);
                                 const cellClassName =
                                   kind === "maintenance"
@@ -663,7 +731,7 @@ export default function DaywiseDistanceReportPage({
                                     key={`${row.object}-${group.key}-${metric.key}`}
                                     className={`${styles.numericCell} ${cellClassName}`}
                                   >
-                                    {formatDistanceMetric(value, filters.roundOff)}
+                                    {formatDistanceOrStatus(value, filters.roundOff)}
                                   </td>
                                 );
                               })
@@ -690,7 +758,7 @@ export default function DaywiseDistanceReportPage({
                           <td
                             colSpan={
                               LEAD_COLUMNS.length +
-                              MIS_DATE_GROUPS.length * MIS_SUB_COLUMNS.length +
+                              misDateGroups.length * MIS_SUB_COLUMNS.length +
                               SUMMARY_COLUMNS.length
                             }
                             className={`${styles.noDataRow} ${styles.daywiseNoDataRow}`}
