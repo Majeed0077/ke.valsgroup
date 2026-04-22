@@ -1,0 +1,375 @@
+.panel {
+  width: 286px;
+  max-height: min(368px, calc(100vh - 120px));
+  padding: 14px;
+  border-radius: 22px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  background:
+    radial-gradient(circle at top center, rgba(143, 226, 248, 0.24), rgba(143, 226, 248, 0) 44%),
+    rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  box-shadow:
+    0 22px 44px rgba(53, 84, 122, 0.18),
+    0 10px 18px rgba(15, 23, 42, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.78);
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 12px;
+  flex: 0 0 auto;
+}
+
+.titleBlock {
+  min-width: 0;
+}
+
+.title {
+  margin: 0;
+  color: #101828;
+  font-size: 0.96rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.badgeRow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.countBadge {
+  min-width: 34px;
+  height: 34px;
+  padding: 0 10px;
+  border-radius: 10px;
+  border: 1px solid rgba(220, 229, 238, 0.92);
+  background: rgba(244, 247, 250, 0.96);
+  color: #4b5565;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.closeButton {
+  width: 30px;
+  height: 30px;
+  border-radius: 10px;
+  border: 1px solid rgba(220, 229, 238, 0.88);
+  background: rgba(255, 255, 255, 0.78);
+  color: #7a8699;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 140ms ease, transform 140ms ease, color 140ms ease;
+}
+
+.closeButton:hover {
+  background: rgba(255, 255, 255, 0.95);
+  color: #394354;
+  transform: translateY(-1px);
+}
+
+.searchWrap {
+  margin-bottom: 10px;
+  position: relative;
+  z-index: 2;
+  flex: 0 0 auto;
+}
+
+.searchShell {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 38px;
+  padding: 0 12px;
+  border-radius: 12px;
+  background: rgba(243, 246, 249, 0.98);
+  border: 1px solid rgba(229, 236, 243, 0.96);
+  color: #98a2b3;
+}
+
+.searchInput {
+  flex: 1;
+  height: 36px;
+  border: 0;
+  outline: none;
+  background: transparent;
+  color: #344054;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.searchInput::placeholder {
+  color: #98a2b3;
+}
+
+.tabs {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  align-items: stretch;
+  gap: 6px;
+  margin-bottom: 10px;
+  position: relative;
+  z-index: 1;
+  flex: 0 0 auto;
+}
+
+.tab {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  border: 0;
+  min-width: 0;
+  min-height: 36px;
+  padding: 6px 6px;
+  border-radius: 12px;
+  background: transparent;
+  color: #556274;
+  line-height: 1.1;
+  font-weight: 700;
+  white-space: nowrap;
+  text-align: center;
+  cursor: pointer;
+  transition: filter 140ms ease, opacity 140ms ease;
+  overflow: hidden;
+}
+
+.tab:hover {
+  filter: brightness(0.98);
+}
+
+.tabText {
+  display: block;
+  min-width: 0;
+  white-space: normal;
+  font-size: 10px;
+  line-height: 1.05;
+  font-weight: 700;
+  text-align: center;
+}
+
+.tabAll {
+  background: #2f3e4d;
+  color: #ffffff;
+}
+
+.tabRunning {
+  background: #d8f3dc;
+  color: #2d6a4f;
+}
+
+.tabStopped {
+  background: #fde2e2;
+  color: #c1121f;
+}
+
+.tabIdle {
+  background: #fff3cd;
+  color: #b08900;
+}
+
+.tabInactive {
+  background: #e6ecf5;
+  color: #475467;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  flex: 1 1 auto;
+  min-height: 0;
+  max-height: none;
+  overflow-y: auto;
+  padding-right: 4px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(167, 179, 194, 0.72) transparent;
+}
+
+.list::-webkit-scrollbar {
+  width: 8px;
+}
+
+.list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.list::-webkit-scrollbar-thumb {
+  background: rgba(167, 179, 194, 0.72);
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+.item {
+  width: 100%;
+  border: 0;
+  border-bottom: 1px solid rgba(229, 236, 243, 0.96);
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  padding: 10px 6px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+  align-items: center;
+  text-align: left;
+  cursor: pointer;
+  transition: background 140ms ease, transform 140ms ease, box-shadow 140ms ease, border-color 140ms ease;
+}
+
+.item:hover {
+  filter: brightness(0.985);
+  transform: none;
+  box-shadow: none;
+}
+
+.itemActive {
+  background: rgba(76, 196, 255, 0.08);
+}
+
+.itemRunning {
+  background: rgba(216, 243, 220, 0.46);
+}
+
+.itemStopped {
+  background: rgba(253, 226, 226, 0.48);
+}
+
+.itemIdle {
+  background: rgba(255, 243, 205, 0.5);
+}
+
+.itemInactive {
+  background: rgba(230, 236, 245, 0.62);
+}
+
+.itemFallback {
+  background: rgba(244, 247, 250, 0.42);
+}
+
+.main {
+  min-width: 0;
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  margin-bottom: 1px;
+}
+
+.vehicleId {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: #1f2937;
+  font-size: 0.76rem;
+  font-weight: 600;
+}
+
+.signal {
+  color: #6b7280;
+  font-size: 0.64rem;
+}
+
+.status {
+  flex: 0 0 auto;
+  font-size: 0.66rem;
+  font-weight: 750;
+  padding: 3px 8px;
+  border-radius: 999px;
+  border: 1px solid rgba(203, 213, 225, 0.6);
+  background: rgba(248, 250, 252, 0.7);
+  line-height: 1.05;
+  letter-spacing: 0.01em;
+}
+
+.statusRunning {
+  color: #1f5a41;
+  border-color: rgba(45, 106, 79, 0.26);
+  background: rgba(216, 243, 220, 0.9);
+}
+
+.statusStopped {
+  color: #9b111c;
+  border-color: rgba(193, 18, 31, 0.24);
+  background: rgba(253, 226, 226, 0.92);
+}
+
+.statusIdle {
+  color: #8f6c00;
+  border-color: rgba(176, 137, 0, 0.26);
+  background: rgba(255, 243, 205, 0.92);
+}
+
+.statusInactive {
+  color: #475467;
+  border-color: rgba(102, 112, 133, 0.22);
+  background: rgba(230, 236, 245, 0.92);
+}
+
+.statusFallback {
+  color: #667085;
+  background: rgba(244, 247, 250, 0.92);
+}
+
+.chevron {
+  color: #9ca3af;
+  font-size: 0.74rem;
+}
+
+.empty {
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.66);
+  border: 1px dashed rgba(206, 216, 227, 0.96);
+  color: #667085;
+  text-align: center;
+  padding: 24px 16px;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+@media (max-width: 640px) {
+  .panel {
+    width: min(286px, calc(100vw - 20px));
+    max-height: min(368px, calc(100vh - 88px));
+    padding: 14px;
+    border-radius: 20px;
+  }
+
+  .tab {
+    min-height: 30px;
+    padding: 5px 4px;
+  }
+
+  .tabText {
+    font-size: 9px;
+  }
+
+  .item {
+    padding: 9px 6px;
+  }
+
+  .vehicleId {
+    font-size: 0.72rem;
+  }
+
+  .status,
+  .signal {
+    font-size: 0.62rem;
+  }
+}

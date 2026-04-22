@@ -1,0 +1,34 @@
+.card {
+  border: 1px solid var(--ke-border);
+  border-radius: 28px;
+  background:
+    radial-gradient(circle at top right, rgba(247, 148, 30, 0.12), transparent 34%),
+    linear-gradient(180deg, var(--ke-surface) 0%, var(--ke-surface-subtle) 100%);
+  box-shadow: var(--ke-shadow-lg);
+  padding: 28px;
+}
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  font-size: 11px;
+  line-height: 1;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ke-primary);
+  font-weight: 700;
+}
+
+.title {
+  margin: 14px 0 10px;
+  font-size: clamp(1.5rem, 2vw, 2rem);
+  line-height: 1.1;
+  color: var(--ke-heading);
+}
+
+.message {
+  margin: 0;
+  max-width: 60ch;
+  color: var(--ke-text);
+  line-height: 1.6;
+}

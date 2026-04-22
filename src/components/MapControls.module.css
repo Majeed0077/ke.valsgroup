@@ -1,0 +1,191 @@
+.mainControlsContainer {
+  position: absolute;
+  z-index: 1265;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: right 0.08s linear, top 0.16s ease, transform 0.16s ease;
+}
+
+.panelOpen {
+  right: calc(var(--telemetry-panel-width, 214px) + var(--telemetry-panel-gap, 28px));
+}
+
+.mainControlsContainer.panelOpen {
+  top: 46%;
+}
+
+.mainControlButton {
+  background-color: #15181f;
+  color: #ffffff;
+  border: none;
+  border-radius: 50%;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.28);
+  width: 30px;
+  height: 30px;
+  margin-bottom: 10px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.2s ease, box-shadow 0.2s ease, transform 0.1s ease;
+  outline: none;
+}
+
+.mainControlsContainer > button:first-child {
+  margin-bottom: 14px;
+}
+
+.mainControlsContainer > button:last-child {
+  margin-bottom: 0;
+}
+
+.mainControlButton:hover {
+  background-color: #232937;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.35);
+}
+
+.mainControlButton:active {
+  background-color: #10141c;
+  transform: scale(0.96);
+}
+
+.zoomControlsInline {
+  display: flex;
+  flex-direction: column;
+  background-color: #15181f;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.28);
+  overflow: hidden;
+  margin-top: 10px;
+}
+
+.zoomButton {
+  background-color: transparent;
+  color: #ffffff;
+  border: none;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.15s ease, transform 0.1s ease;
+  outline: none;
+}
+
+.zoomButtonIn {
+  border-bottom: 1px solid #2f3644;
+}
+
+.zoomButton:hover {
+  background-color: #232937;
+}
+
+.zoomButton:active {
+  background-color: #10141c;
+  transform: scale(0.95);
+}
+
+.mobileControlsDock {
+  position: absolute;
+  right: 14px;
+  top: 44px;
+  z-index: 1286;
+  display: none;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 10px;
+}
+
+.mobileControlsTrigger {
+  width: 46px;
+  height: 46px;
+  border: none;
+  border-radius: 16px;
+  background: rgba(17, 23, 34, 0.96);
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 10px 24px rgba(11, 14, 21, 0.28);
+}
+
+.mobileControlsTriggerActive {
+  background: var(--ke-primary);
+  color: #ffffff;
+}
+
+.mobileControlsPanel {
+  width: min(250px, calc(100vw - 72px));
+  padding: 10px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.98);
+  box-shadow: 0 18px 40px rgba(13, 18, 28, 0.2);
+  border: 1px solid rgba(20, 24, 34, 0.08);
+  backdrop-filter: blur(10px);
+}
+
+.mobileControlsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.mobileControlButton,
+.mobileZoomButton {
+  border: none;
+  border-radius: 14px;
+  background: #11161f;
+  color: #fff;
+  min-height: 42px;
+  padding: 8px 10px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  justify-content: flex-start;
+  box-shadow: 0 8px 18px rgba(13, 18, 28, 0.15);
+}
+
+.mobileControlButton span,
+.mobileZoomButton span {
+  font-size: 10px;
+  line-height: 1.1;
+  font-weight: 700;
+  text-align: left;
+}
+
+.mobileZoomRow {
+  margin-top: 10px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+}
+
+@media (max-width: 900px) {
+  .mainControlsContainer.panelOpen {
+    top: 47%;
+  }
+
+  .panelOpen {
+    right: min(
+      calc(var(--telemetry-panel-width, 214px) + var(--telemetry-panel-gap, 28px)),
+      calc(100vw - 82px)
+    );
+  }
+}
+
+@media (max-width: 768px) {
+  .mainControlsContainer {
+    display: none;
+  }
+
+  .mobileControlsDock {
+    display: flex;
+  }
+}

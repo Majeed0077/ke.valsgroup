@@ -1,0 +1,24 @@
+.routeShell {
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at top, rgba(247, 148, 30, 0.08), transparent 24%),
+    linear-gradient(180deg, var(--ke-app-bg) 0%, var(--ke-app-bg-alt) 100%);
+}
+
+.contentFrame {
+  min-height: 100vh;
+  position: relative;
+  transition:
+    opacity 0.18s ease,
+    filter 0.18s ease;
+}
+
+.contentFrameNavigating {
+  opacity: 0.82;
+  filter: saturate(0.96);
+}
+
+.contentSurface {
+  min-height: 100vh;
+  position: relative;
+}
